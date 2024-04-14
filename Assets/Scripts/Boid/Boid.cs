@@ -26,18 +26,18 @@ namespace Boid {
         private Vector3 _avoidance;
         [field: SerializeField] public float Cognitive { get; set; } = .8f;
         [field: SerializeField] public float Social { get; set; } = .2f;
+
+        public int flockRunCount;
+        
         [SerializeField] private PsopType technique = PsopType.Individual;
         private Vector3? Target => TargetProvider.Target;
 
         private Vector3 PersonalBest { get; set; }
 
         private Vector3 GlobalBest {
-            get {
-                var neighbors = technique switch {
-                    PsopType.Global => Neighbours.Get(),
-                    PsopType.Individual => Neighbours.Get(transform.position, perception),
-                    _ => new()
-                };
+            get
+            {
+                var neighbors = flockRunCount > 10 ? Neighbours.Get(transform.position, perception) : Neighbours.Get();
                 return neighbors.Aggregate(neighbors.First(), (min, boid) =>
                         Vector3.Distance(min.PersonalBest, Target ?? min.PersonalBest) <
                         Vector3.Distance(boid.PersonalBest, Target ?? boid.PersonalBest)
